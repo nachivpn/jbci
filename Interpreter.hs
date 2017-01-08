@@ -67,10 +67,19 @@ maybeFst xs
   | Nothing `elem` xs = Nothing
   | otherwise = Just (map (fst.fromJust) xs)
 
-int :: Parser Integer
-int = do
+posint :: Parser Integer
+posint = do
     s <- oneOrMore digit
     return (read s)
+
+negint :: Parser Integer
+negint = do
+    neg <- char '-' 
+    s <- oneOrMore digit
+    return $ (read s) * (-1)
+
+int :: Parser Integer
+int = posint <|> negint
 
 double :: Parser Double
 double = do
@@ -85,7 +94,7 @@ command = oneOrMore (sat isAlpha)
 iarg :: Parser Integer
 iarg = do
     _ <- oneOrMore (sat isSpace)
-    read `fmap` oneOrMore digit
+    int
 
 larg :: Parser String
 larg = do
